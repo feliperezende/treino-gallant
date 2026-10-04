@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Gallant X · treino</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23090a0c'/%3E%3Cpath d='M6 20h20M9 20a7 7 0 0 1 14 0' fill='none' stroke='%23e2ff4d' stroke-width='2'/%3E%3Ccircle cx='16' cy='13' r='2' fill='%23e2ff4d'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #090a0c;
+    --bg-2: #12141a;
+    --card: #171a21;
+    --card-2: #1e222b;
+    --text: #f6f3ec;
+    --muted: #a8a396;
+    --dim: #6f6b63;
+    --line: rgba(255,255,255,.1);
+    --lime: #e2ff4d;
+    --lime-ink: #14160a;
+    --hard: #ff5a4a;
+    --firm: #ffc14a;
+    --easy: #3ee0b0;
+    --warm: #79c6ff;
+    --cool: #c4b2ff;
+    --danger: #ff6b6b;
+    --shadow: 0 10px 40px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    min-height: 100dvh;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+  }
+  button, input { font: inherit; color: inherit; }
+  button {
+    touch-action: manipulation;
+    cursor: pointer;
+    border: 0;
+    background: none;
+  }
+  button:focus-visible {
+    outline: 2px solid var(--lime);
+    outline-offset: 3px;
+  }
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    padding:
+      calc(18px + env(safe-area-inset-top))
+      16px
+      calc(28px + env(safe-area-inset-bottom));
+  }
+  .kicker {
+    margin: 0;
+    font-size: .78rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--lime);
+    font-weight: 700;
+  }
+  h1 {
+    margin: 6px 0 0;
+    font-size: 2rem;
+    line-height: 1.05;
+    letter-spacing: -.03em;
+    font-weight: 800;
+  }
+  .lede {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.35;
+  }
+  .weeks {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 0 0 14px;
+  }
+  .weeks button {
+    min-height: 56px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .weeks button.on {
+    background: var(--lime);
+    color: var(--lime-ink);
+    border-color: var(--lime);
+  }
+  .note {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+  .section-label {
+    margin: 22px 0 10px;
+    font-size: .75rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 700;
+  }
+  .plan { display: flex; flex-direction: column; gap: 10px; }
+  .slot, .pick, .hist {
+    width: 100%;
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 14px 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-height: 76px;
+  }
+  .slot:active, .pick:active, .hist:active { transform: scale(.985); }
+  .idx {
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: var(--card-2);
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .slot.done { border-color: rgba(226,255,77,.45); }
+  .slot.done .idx { background: var(--lime); color: var(--lime-ink); }
+  .slot-body, .pick-body { flex: 1; min-width: 0; }
+  .slot-title, .pick-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+  }
+  .slot-meta, .pick-meta, .hist-meta {
+    color: var(--muted);
+    font-size: .95rem;
+    margin-top: 2px;
+  }
+  .go {
+    color: var(--lime);
+    font-weight: 800;
+    font-size: .95rem;
+    flex: none;
+  }
+  .picks { display: flex; flex-direction: column; gap: 8px; }
+  .tip {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #14160e;
+    border: 1px solid rgba(226,255,77,.18);
+    color: #d9d6cc;
+    line-height: 1.4;
+    font-size: 1rem;
+  }
+  .empty {
+    color: var(--dim);
+    padding: 8px 2px 0;
+    font-size: 1rem;
+  }
+  .hist { cursor: default; }
+  .hist-title { font-weight: 750; font-size: 1.05rem; }
+  .badge {
+    flex: none;
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .badge.ok { color: var(--lime); }
+
+  /* session */
+  body.in-session { overflow: hidden; user-select: none; }
+  body.in-session .app {
+    height: 100dvh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 48px;
+  }
+  .ghost {
+    min-height: 48px;
+    padding: 0 12px;
+    border-radius: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .ghost.danger { color: var(--danger); }
+  .who {
+    font-weight: 800;
+    letter-spacing: -.02em;
+    font-size: 1.05rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .phase {
+    margin: 0 auto 4px;
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 10px;
+    border-radius: 999px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-size: .78rem;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--phase, var(--lime));
+    box-shadow: 0 0 12px var(--phase, var(--lime));
+  }
+  .stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+  .block-name {
+    margin: 14px 0 0;
+    text-align: center;
+    font-size: clamp(1.35rem, 5vw, 1.7rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+  .timer {
+    margin: 4px 0 0;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 820;
+    font-size: clamp(5.2rem, 26vw, 8.2rem);
+    letter-spacing: -.05em;
+    line-height: .9;
+  }
+  .cadence {
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 7vw, 2.3rem);
+    letter-spacing: -.03em;
+    line-height: 1;
+  }
+  .cadence span {
+    font-size: .42em;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-left: 6px;
+    font-weight: 750;
+  }
+  .resist {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 750;
+  }
+  .resist b { font-weight: 850; }
+  .cue {
+    margin: 12px auto 0;
+    max-width: 26rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+  .next {
+    margin: 14px 0 0;
+    text-align: center;
+    color: var(--dim);
+    font-size: 1rem;
+  }
+  .next strong { color: var(--text); font-weight: 750; }
+  .bar {
+    margin-top: 12px;
+    height: 10px;
+    border-radius: 999px;
+    background: #232833;
+    overflow: hidden;
+  }
+  .bar > i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--phase, var(--lime));
+    border-radius: inherit;
+  }
+  .bar-label {
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--dim);
+    font-size: .9rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .controls { margin-top: 12px; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: 8px;
+  }
+  .ctrl {
+    min-height: 64px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .ctrl.primary {
+    background: var(--lime);
+    color: var(--lime-ink);
+    border-color: var(--lime);
+    min-height: 72px;
+    font-size: 1.35rem;
+  }
+  .ctrl.wide {
+    width: 100%;
+    margin-top: 8px;
+    min-height: 56px;
+  }
+  [hidden] { display: none !important; }
+  .confirm {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .confirm .ctrl { flex: 1; }
+  .paused-flag {
+    text-align: center;
+    color: var(--firm);
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-size: .78rem;
+    min-height: 1em;
+  }
+
+  /* summary */
+  .sum-time {
+    margin: 28px 0 0;
+    font-size: clamp(4.2rem, 20vw, 6.2rem);
+    font-weight: 820;
+    letter-spacing: -.05em;
+    line-height: .9;
+    font-variant-numeric: tabular-nums;
+  }
+  .sum-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 16px;
+    min-height: 96px;
+  }
+  .stat b {
+    display: block;
+    font-size: 1.8rem;
+    letter-spacing: -.03em;
+  }
+  .stat span { color: var(--muted); }
+  .coach {
+    margin-top: 16px;
+    padding: 16px;
+    border-left: 4px solid var(--lime);
+    background: var(--card);
+    border-radius: 0 16px 16px 0;
+    font-size: 1.15rem;
+    line-height: 1.4;
+  }
+  .phase-hard { --phase: var(--hard); }
+  .phase-firm { --phase: var(--firm); }
+  .phase-easy { --phase: var(--easy); }
+  .phase-warm { --phase: var(--warm); }
+  .phase-cool { --phase: var(--cool); }
+  @media (max-height: 740px) {
+    .timer { font-size: clamp(4rem, 22vw, 6rem); }
+    .cadence { font-size: 1.6rem; margin-top: 4px; }
+    .cue { margin-top: 6px; font-size: 1rem; }
+    .block-name { margin-top: 2px; font-size: 1.25rem; }
+    .ctrl.primary { min-height: 64px; }
+    .next { margin-top: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dot { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<script>
+(function () {
+  const KEY_WEEK = "gallantx-week";
+  const KEY_HIST = "gallantx-history";
+  const KEY_DONE = "gallantx-done";
+  const KEY_LAST = "gallantx-last";
+
+  const PHASE = {
+    warm: "Aquecimento",
+    firm: "Firme",
+    hard: "Forte",
+    easy: "Leve",
+    cool: "Calma"
+  };
+
+  function seg(name, sec, kind, cadence, unit, resistance, cue) {
+    return { name, sec, kind, cadence, unit, resistance, cue };
+  }
+
+  function warmup() {
+    return seg("Aquecimento", 5 * 60, "warm", "80–90", "rpm", "Baixa", "Solto. Resistência baixa, respira fácil.");
+  }
+  function cooldown() {
+    return seg("Volta à calma", 5 * 60, "cool", "Devagar", "", "Baixa", "Mais devagar. Deixa a respiração baixar.");
+  }
+  function firmBlock(name, min) {
+    return seg(name, min * 60, "firm", "85–95", "rpm", "Média", "Dá para falar, mas não conversar à vontade.");
+  }
+  function continuous(min, name) {
+    return [warmup(), firmBlock(name || "Ritmo firme", min), cooldown()];
+  }
+  function intervals(rounds) {
+    const mid = [];
+    for (let i = 1; i <= rounds; i++) {
+      mid.push(seg("Tiro " + i, 60, "hard", "95–110", "rpm", "Média", "Sobe a cadência. Gira, não trava o pedal."));
+      mid.push(seg("Recuperação " + i, 60, "easy", "80–90", "rpm", "Baixa", "Solta. Recupera o fôlego."));
+    }
+    mid.push(firmBlock("Fechamento firme", 5));
+    return [warmup(), ...mid, cooldown()];
+  }
+  function mixed() {
+    const mid = [firmBlock("Bloco firme", 15)];
+    for (let i = 1; i <= 6; i++) {
+      mid.push(seg("Tiro " + i, 90, "hard", "95–110", "rpm", "Média", "Noventa segundos fortes. Mantém a forma."));
+      mid.push(seg("Solta " + i, 90, "easy", "80–90", "rpm", "Baixa", "Solta a perna. Prepara o próximo."));
+    }
+    return [warmup(), ...mid, cooldown()];
+  }
+
+  const WORKOUTS = {
+    "a-curto": { id: "a-curto", short: "A curto", name: "A curto", detail: "25 min firme", blurb: "Queima contínua, versão da semana 1.", build: () => continuous(25) },
+    "a": { id: "a", short: "A", name: "A · queima", detail: "30 min firme", blurb: "Ritmo constante. O grosso da queima.", build: () => continuous(30) },
+    "a-40": { id: "a-40", short: "A 40", name: "A · 40 min", detail: "40 min firme", blurb: "Semana 4. Contínuo mais longo.", build: () => continuous(40) },
+    "b-10": { id: "b-10", short: "B", name: "B · intervalos", detail: "10 tiros de 1 min", blurb: "1 min forte, 1 min leve, e 5 min firmes.", build: () => intervals(10) },
+    "b-12": { id: "b-12", short: "B 12", name: "B · 12 tiros", detail: "12 tiros de 1 min", blurb: "Semana 4. Dois tiros a mais.", build: () => intervals(12) },
+    "c": { id: "c", short: "C", name: "C · longo", detail: "35 min firme", blurb: "Mesmo ritmo do A, sem sprint.", build: () => continuous(35, "Longo") },
+    "d": { id: "d", short: "D", name: "D · misto", detail: "15 min + 6×90s", blurb: "Bloco firme, depois tiros de 90 segundos.", build: () => mixed() }
+  };
+
+  const PLANS = {
+    1: { note: "Adaptação. Volume mais curto.", slots: ["a-curto", "b-10", "c", "a-curto"] },
+    2: { note: "Quatro treinos. O que emagrece é repetir.", slots: ["a", "b-10", "c", "d"] },
+    3: { note: "Igual à semana 2. Segura a qualidade.", slots: ["a", "b-10", "c", "d"] },
+    4: { note: "Sobe o contínuo pra 40 min e o B pra 12 tiros.", slots: ["a-40", "b-12", "c", "d"] }
+  };
+
+  const app = document.getElementById("app");
+  let week = loadWeek();
+  let audioCtx = null;
+  let wakeLock = null;
+  let sessionLive = false;
+
+  const S = {
+    workout: null,
+    segments: [],
+    index: 0,
+    running: false,
+    startedOnce: false,
+    endAt: 0,
+    remainMs: 0,
+    accumulatedMs: 0,
+    runStartedAt: 0,
+    completed: 0,
+    skipped: 0,
+    timer: null,
+    week: null,
+    slot: null,
+    refs: null,
+    confirm: false
+  };
+
+  function loadWeek() {
+    const n = parseInt(localStorage.getItem(KEY_WEEK) || "1", 10);
+    return n >= 1 && n <= 4 ? n : 1;
+  }
+  function readJSON(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+  function doneMap() {
+    const d = readJSON(KEY_DONE, {});
+    for (let w = 1; w <= 4; w++) {
+      if (!Array.isArray(d[w]) || d[w].length !== 4) d[w] = [false, false, false, false];
+    }
+    return d;
+  }
+  function history() {
+    const h = readJSON(KEY_HIST, []);
+    return Array.isArray(h) ? h : [];
+  }
+  function totalSec(id) {
+    return WORKOUTS[id].build().reduce((s, x) => s + x.sec, 0);
+  }
+  function fmtClock(ms) {
+    const s = Math.max(0, Math.ceil(ms / 1000 - 1e-6));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
+  }
+  function fmtDur(sec) {
+    const s = Math.max(0, Math.round(sec));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
+  }
+  function fmtWhen(iso) {
+    const d = new Date(iso);
+    const now = new Date();
+    const sameDay = d.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })
+      === now.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    const time = d.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+    if (sameDay) return "hoje · " + time;
+    const day = d.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "short" });
+    return day.replace(".", "") + " · " + time;
+  }
+  function el(tag, attrs) {
+    const n = document.createElement(tag);
+    const a = attrs || {};
+    Object.keys(a).forEach(function (k) {
+      const v = a[k];
+      if (k === "class") n.className = v;
+      else if (k.slice(0, 2) === "on" && typeof v === "function") n.addEventListener(k.slice(2), v);
+      else if (v != null && v !== false) n.setAttribute(k, v === true ? "" : v);
+    });
+    for (let i = 2; i < arguments.length; i++) {
+      const kid = arguments[i];
+      if (kid == null || kid === false) continue;
+      n.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+    return n;
+  }
+  function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); }
+
+  function unlockAudio() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  }
+  function tone(freq, when, dur, type) {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type || "square";
+    o.frequency.value = freq;
+    const t = audioCtx.currentTime + when;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.18, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  }
+  function beep(kind) {
+    try {
+      if (!audioCtx) return;
+      if (kind === "hard") {
+        tone(740, 0, 0.12);
+        tone(980, 0.16, 0.14);
+      } else if (kind === "done") {
+        tone(520, 0, 0.12, "sine");
+        tone(680, 0.16, 0.12, "sine");
+        tone(880, 0.32, 0.2, "sine");
+      } else if (kind === "easy" || kind === "cool" || kind === "warm") {
+        tone(440, 0, 0.16, "sine");
+      } else {
+        tone(620, 0, 0.15);
+      }
+    } catch (e) {}
+  }
+  function buzz(kind) {
+    try {
+      if (!navigator.vibrate) return;
+      if (kind === "hard") navigator.vibrate([50, 40, 50, 40, 90]);
+      else if (kind === "done") navigator.vibrate([80, 50, 80, 50, 160]);
+      else navigator.vibrate(45);
+    } catch (e) {}
+  }
+  async function lockScreen() {
+    try {
+      if (!navigator.wakeLock) return;
+      if (wakeLock) return;
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", function () { wakeLock = null; });
+    } catch (e) {}
+  }
+  async function unlockScreen() {
+    try {
+      if (wakeLock) await wakeLock.release();
+    } catch (e) {}
+    wakeLock = null;
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && sessionLive && S.startedOnce && !S.refs?.summary) {
+      lockScreen();
+    }
+  });
+
+  function renderHome() {
+    sessionLive = false;
+    document.body.classList.remove("in-session");
+    document.title = "Gallant X · treino";
+    clear(app);
+    const plan = PLANS[week];
+    const checks = doneMap()[week];
+
+    app.append(
+      el("p", { class: "kicker" }, "Gallant X"),
+      el("h1", null, "Perder peso"),
+      el("p", { class: "lede" }, "4 treinos na semana. Aquecimento e volta à calma já entram no relógio.")
+    );
+
+    const weeks = el("div", { class: "weeks" });
+    for (let w = 1; w <= 4; w++) {
+      weeks.append(el("button", {
+        class: w === week ? "on" : "",
+        type: "button",
+        "aria-label": "Semana " + w,
+        "aria-pressed": w === week ? "true" : "false",
+        onclick: function () {
+          week = w;
+          localStorage.setItem(KEY_WEEK, String(w));
+          renderHome();
+        }
+      }, String(w)));
+    }
+    app.append(el("div", { class: "section-label", style: "margin-top:16px" }, "Semana"), weeks, el("p", { class: "note" }, plan.note));
+
+    const planBox = el("div", { class: "plan" });
+    plan.slots.forEach(function (id, i) {
+      const w = WORKOUTS[id];
+      const btn = el("button", {
+        class: "slot" + (checks[i] ? " done" : ""),
+        type: "button",
+        onclick: function () { openSession(id, week, i); }
+      },
+        el("div", { class: "idx" }, checks[i] ? "✓" : String(i + 1)),
+        el("div", { class: "slot-body" },
+          el("div", { class: "slot-title" }, w.name),
+          el("div", { class: "slot-meta" }, w.detail + " · " + Math.round(totalSec(id) / 60) + " min no total")
+        ),
+        el("div", { class: "go" }, checks[i] ? "de novo" : "bora")
+      );
+      planBox.append(btn);
+    });
+    app.append(el("div", { class: "section-label" }, "Plano da semana"), planBox);
+
+    const picks = el("div", { class: "picks" });
+    ["a-curto", "a", "a-40", "b-10", "b-12", "c", "d"].forEach(function (id) {
+      const w = WORKOUTS[id];
+      picks.append(el("button", {
+        class: "pick",
+        type: "button",
+        onclick: function () { openSession(id, null, null); }
+      },
+        el("div", { class: "pick-body" },
+          el("div", { class: "pick-title" }, w.name),
+          el("div", { class: "pick-meta" }, w.blurb)
+        ),
+        el("div", { class: "go" }, "abrir")
+      ));
+    });
+    app.append(el("div", { class: "section-label" }, "Ou escolhe na hora"), picks);
+
+    app.append(el("p", { class: "tip" }, "Folga no dia seguinte ao B e ao D. Proteína em cada refeição. Não compensa o treino com lanche."));
+
+    const hist = history();
+    app.append(el("div", { class: "section-label" }, "Histórico"));
+    if (!hist.length) {
+      app.append(el("p", { class: "empty" }, "Nenhum treino salvo ainda."));
+    } else {
+      hist.forEach(function (item) {
+        const full = item.finished && item.intervalsDone === item.intervalsTotal;
+        app.append(el("div", { class: "hist" },
+          el("div", { class: "pick-body" },
+            el("div", { class: "hist-title" }, item.name),
+            el("div", { class: "hist-meta" }, fmtWhen(item.date) + " · " + fmtDur(item.duration))
+          ),
+          el("div", { class: "badge" + (full ? " ok" : "") }, full ? "feito" : "parcial")
+        ));
+      });
+    }
+  }
+
+  function openSession(id, wk, slot) {
+    const w = WORKOUTS[id];
+    S.workout = w;
+    S.segments = w.build().map(function (x) { return Object.assign({}, x); });
+    S.index = 0;
+    S.running = false;
+    S.startedOnce = false;
+    S.remainMs = S.segments[0].sec * 1000;
+    S.endAt = 0;
+    S.accumulatedMs = 0;
+    S.runStartedAt = 0;
+    S.completed = 0;
+    S.skipped = 0;
+    S.week = wk;
+    S.slot = slot;
+    S.confirm = false;
+    if (S.timer) clearInterval(S.timer);
+    S.timer = null;
+    sessionLive = true;
+    document.body.classList.add("in-session");
+    buildSession();
+    paint();
+  }
+
+  function remainNow() {
+    if (S.running) return Math.max(0, S.endAt - Date.now());
+    return S.remainMs;
+  }
+  function elapsedNow() {
+    const extra = S.running ? Date.now() - S.runStartedAt : 0;
+    return S.accumulatedMs + extra;
+  }
+  function progressFrac() {
+    const total = S.segments.reduce(function (s, x) { return s + x.sec; }, 0);
+    let done = 0;
+    for (let i = 0; i < S.index; i++) done += S.segments[i].sec;
+    const cur = S.segments[S.index];
+    if (!cur || !total) return 1;
+    const curDone = Math.min(cur.sec, Math.max(0, cur.sec - remainNow() / 1000));
+    return Math.max(0, Math.min(1, (done + curDone) / total));
+  }
+
+  function buildSession() {
+    clear(app);
+    const back = el("button", { class: "ghost", type: "button", id: "btn-back" }, "Voltar");
+    const end = el("button", { class: "ghost danger", type: "button", id: "btn-end" }, "Encerrar");
+    const who = el("div", { class: "who" }, S.workout.name);
+    const top = el("div", { class: "top" }, back, who, end);
+    const phase = el("div", { class: "phase", id: "phase" }, el("i", { class: "dot" }), el("span", { id: "phase-label" }, ""));
+    const name = el("h2", { class: "block-name", id: "block-name" }, "");
+    const timer = el("div", { class: "timer", id: "timer" }, "00:00");
+    const cadence = el("div", { class: "cadence", id: "cadence" }, "");
+    const resist = el("div", { class: "resist", id: "resist" }, "");
+    const cue = el("p", { class: "cue", id: "cue" }, "");
+    const next = el("p", { class: "next", id: "next" }, "");
+    const bar = el("div", { class: "bar" }, el("i", { id: "bar-fill" }));
+    const barLabel = el("div", { class: "bar-label" },
+      el("span", { id: "bar-count" }, ""),
+      el("span", { id: "bar-pct" }, "")
+    );
+    const flag = el("div", { class: "paused-flag", id: "flag" }, "");
+    const minus = el("button", { class: "ctrl", type: "button", id: "btn-minus" }, "−15s");
+    const primary = el("button", { class: "ctrl primary", type: "button", id: "btn-primary" }, "Começar");
+    const plus = el("button", { class: "ctrl", type: "button", id: "btn-plus" }, "+15s");
+    const skip = el("button", { class: "ctrl wide", type: "button", id: "btn-skip" }, "Pular bloco");
+    const confirm = el("div", { class: "confirm", id: "confirm", hidden: "hidden" },
+      el("button", { class: "ctrl", type: "button", id: "btn-cancel-end" }, "Continuar"),
+      el("button", { class: "ctrl", type: "button", id: "btn-really-end", style: "color:var(--danger)" }, "Encerrar agora")
+    );
+    const controls = el("div", { class: "controls" },
+      flag,
+      el("div", { class: "row" }, minus, primary, plus),
+      skip,
+      confirm
+    );
+    const stage = el("div", { class: "stage phase-firm", id: "stage" }, phase, name, timer, cadence, resist, cue, next, bar, barLabel);
+    app.append(top, stage, controls);
+
+    back.addEventListener("click", function () {
+      if (!S.startedOnce) leaveHome();
+      else askEnd();
+    });
+    end.addEventListener("click", askEnd);
+    primary.addEventListener("click", toggleRun);
+    minus.addEventListener("click", function () { nudge(-15); });
+    plus.addEventListener("click", function () { nudge(15); });
+    skip.addEventListener("click", skipBlock);
+    document.getElementById("btn-cancel-end").addEventListener("click", function () {
+      S.confirm = false;
+      paint();
+    });
+    document.getElementById("btn-really-end").addEventListener("click", function () { finish(false); });
+
+    S.refs = {
+      back: back, end: end, phase: phase,
+      phaseLabel: document.getElementById("phase-label"),
+      stage: stage, name: name, timer: timer, cadence: cadence,
+      resist: resist, cue: cue, next: next,
+      fill: document.getElementById("bar-fill"),
+      count: document.getElementById("bar-count"),
+      pct: document.getElementById("bar-pct"),
+      flag: flag, primary: primary, skip: skip,
+      confirm: confirm
+    };
+  }
+
+  function leaveHome() {
+    if (S.timer) clearInterval(S.timer);
+    S.running = false;
+    sessionLive = false;
+    unlockScreen();
+    renderHome();
+  }
+
+  function askEnd() {
+    if (!S.startedOnce) { leaveHome(); return; }
+    S.confirm = true;
+    paint();
+  }
+
+  function signal(kind) {
+    beep(kind);
+    buzz(kind);
+  }
+
+  function toggleRun() {
+    S.confirm = false;
+    if (S.running) {
+      S.remainMs = Math.max(0, S.endAt - Date.now());
+      S.accumulatedMs += Date.now() - S.runStartedAt;
+      S.running = false;
+      paint();
+      return;
+    }
+    unlockAudio();
+    const firstStart = !S.startedOnce;
+    S.startedOnce = true;
+    S.running = true;
+    S.runStartedAt = Date.now();
+    S.endAt = Date.now() + S.remainMs;
+    lockScreen();
+    if (firstStart) signal(S.segments[S.index].kind);
+    if (!S.timer) S.timer = setInterval(tick, 100);
+    paint();
+  }
+
+  function tick() {
+    if (!S.running) return;
+    if (S.endAt - Date.now() <= 0) {
+      completeBlock();
+      return;
+    }
+    paint();
+  }
+
+  function arm() {
+    const cur = S.segments[S.index];
+    S.remainMs = cur.sec * 1000;
+    if (S.running) S.endAt = Date.now() + S.remainMs;
+  }
+
+  function completeBlock() {
+    S.completed += 1;
+    S.index += 1;
+    if (S.index >= S.segments.length) {
+      finish(true);
+      return;
+    }
+    arm();
+    signal(S.segments[S.index].kind);
+    paint();
+  }
+
+  function skipBlock() {
+    S.confirm = false;
+    if (S.startedOnce) S.skipped += 1;
+    S.index += 1;
+    if (S.index >= S.segments.length) {
+      if (!S.startedOnce) { leaveHome(); return; }
+      finish(false);
+      return;
+    }
+    arm();
+    if (S.startedOnce) signal(S.segments[S.index].kind);
+    paint();
+  }
+
+  function nudge(deltaSec) {
+    const cur = S.segments[S.index];
+    if (!cur) return;
+    const remain = remainNow() / 1000;
+    let next = remain + deltaSec;
+    if (next < 5) next = 5;
+    const diff = next - remain;
+    cur.sec = Math.max(5, cur.sec + diff);
+    if (S.running) S.endAt += diff * 1000;
+    else S.remainMs = next * 1000;
+    paint();
+  }
+
+  function paint() {
+    const r = S.refs;
+    if (!r) return;
+    const cur = S.segments[S.index];
+    if (!cur) return;
+    const left = remainNow();
+    r.stage.className = "stage phase-" + cur.kind;
+    r.phase.className = "phase phase-" + cur.kind;
+    r.phaseLabel.textContent = PHASE[cur.kind] || "";
+    r.name.textContent = cur.name;
+    r.timer.textContent = fmtClock(left);
+    r.cadence.textContent = "";
+    r.cadence.append(document.createTextNode(cur.cadence));
+    if (cur.unit) r.cadence.append(el("span", null, cur.unit));
+    r.resist.textContent = "";
+    r.resist.append(document.createTextNode("Resistência "));
+    r.resist.append(el("b", null, cur.resistance));
+    r.cue.textContent = cur.cue;
+    const nxt = S.segments[S.index + 1];
+    r.next.textContent = "";
+    if (nxt) {
+      r.next.append(document.createTextNode("Depois: "));
+      r.next.append(el("strong", null, nxt.name));
+      r.next.append(document.createTextNode(" · " + fmtClock(nxt.sec * 1000)));
+    } else {
+      r.next.append(document.createTextNode("Último bloco"));
+    }
+    const frac = progressFrac();
+    r.fill.style.width = (frac * 100).toFixed(1) + "%";
+    r.count.textContent = "Bloco " + (S.index + 1) + " de " + S.segments.length;
+    r.pct.textContent = Math.round(frac * 100) + "%";
+    r.flag.textContent = S.startedOnce && !S.running ? "Pausado" : "";
+    r.primary.textContent = !S.startedOnce ? "Começar" : (S.running ? "Pausar" : "Continuar");
+    r.back.textContent = S.startedOnce ? "Sair" : "Voltar";
+    r.end.style.visibility = S.startedOnce ? "visible" : "hidden";
+    r.confirm.hidden = !S.confirm;
+    document.title = fmtClock(left) + " · " + cur.name;
+  }
+
+  function finish(natural) {
+    if (S.running) {
+      S.accumulatedMs += Date.now() - S.runStartedAt;
+      S.running = false;
+    }
+    if (S.timer) clearInterval(S.timer);
+    S.timer = null;
+    const elapsedSec = Math.round(S.accumulatedMs / 1000);
+    const planned = S.segments.reduce(function (s, x) { return s + x.sec; }, 0);
+    const allDone = natural && S.completed === S.segments.length && S.skipped === 0;
+    const saveIt = S.startedOnce && (allDone || elapsedSec >= 30);
+    const rec = {
+      date: new Date().toISOString(),
+      id: S.workout.id,
+      name: S.workout.name,
+      duration: elapsedSec,
+      intervalsDone: S.completed,
+      intervalsTotal: S.segments.length,
+      skipped: S.skipped,
+      finished: allDone,
+      week: S.week,
+      slot: S.slot
+    };
+    if (saveIt) {
+      const hist = history();
+      hist.unshift(rec);
+      localStorage.setItem(KEY_HIST, JSON.stringify(hist.slice(0, 30)));
+      localStorage.setItem(KEY_LAST, JSON.stringify({
+        date: rec.date,
+        workoutId: rec.id,
+        duration: rec.duration
+      }));
+      if (allDone && S.week && S.slot != null) {
+        const map = doneMap();
+        map[S.week][S.slot] = true;
+        localStorage.setItem(KEY_DONE, JSON.stringify(map));
+      } else if (S.week && S.slot != null && elapsedSec >= planned * 0.8) {
+        const map = doneMap();
+        map[S.week][S.slot] = true;
+        localStorage.setItem(KEY_DONE, JSON.stringify(map));
+      }
+    }
+    if (natural) {
+      signal("done");
+    }
+    sessionLive = false;
+    unlockScreen();
+    showSummary(rec, saveIt, natural);
+  }
+
+  function showSummary(rec, saved, natural) {
+    document.body.classList.remove("in-session");
+    document.title = "Gallant X · pronto";
+    S.refs = { summary: true };
+    clear(app);
+    const full = rec.finished;
+    app.append(
+      el("p", { class: "kicker" }, full ? "Treino feito" : "Treino encerrado"),
+      el("h1", null, rec.name),
+      el("div", { class: "sum-time" }, fmtDur(rec.duration)),
+      el("p", { class: "lede" }, "tempo pedalando, sem a pausa")
+    );
+    const grid = el("div", { class: "sum-grid" },
+      el("div", { class: "stat" },
+        el("b", null, rec.intervalsDone + "/" + rec.intervalsTotal),
+        el("span", null, "blocos feitos")
+      ),
+      el("div", { class: "stat" },
+        el("b", null, String(rec.skipped || 0)),
+        el("span", null, rec.skipped === 1 ? "bloco pulado" : "blocos pulados")
+      )
+    );
+    app.append(grid);
+    app.append(el("p", { class: "coach" }, "Conta pro treinador como foi: o que doeu e se sobrou fôlego."));
+    if (!saved) {
+      app.append(el("p", { class: "note" }, "Curto demais. Não entrei no histórico."));
+    } else if (!full) {
+      app.append(el("p", { class: "note" }, "Salvei como parcial."));
+    } else {
+      app.append(el("p", { class: "note" }, "Salvo no histórico."));
+    }
+    app.append(el("button", {
+      class: "ctrl primary",
+      type: "button",
+      style: "width:100%;margin-top:18px",
+      onclick: function () { renderHome(); }
+    }, "Voltar"));
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (!sessionLive || !S.refs || S.refs.summary) return;
+    if (e.key === " " || e.code === "Space") {
+      e.preventDefault();
+      toggleRun();
+    } else if (e.key === "ArrowRight") nudge(15);
+    else if (e.key === "ArrowLeft") nudge(-15);
+    else if (e.key === "n" || e.key === "N") skipBlock();
+  });
+
+  renderHome();
+})();
+</script>
+</body>
+</html>
